@@ -2,11 +2,16 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import ImageProcessor from "../libs/image-processor"
 import Webcam from "react-webcam";
 import ThresholdAlgorithms from "../libs/threshold-algorithms";
+const videoConstraints = {
+    facingMode: { exact: "environment" }
+};
 export default function HomePage() {
     const imageProcessor = useRef<ImageProcessor>(new ImageProcessor());
     const thresholdAlgorithms = new ThresholdAlgorithms(); // Threshold algoritmaları sınıfını oluşturuyoruz
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     const [screenshot, setScreenShot] = useState<string>("");
+
+
 
 
     const processImage = () => {
@@ -19,7 +24,7 @@ export default function HomePage() {
         const image = new Image();
         image.onload = () => {
             ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
-            const imageData = ctx.getImageData(0,0,canvas.width, canvas.height).data;
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
             const thresholdLevel = thresholdAlgorithms.binarizationThresholdNormalized(imageData);
             console.log(thresholdLevel)
             const processedImage = imageProcessor.current.processImage(canvas, thresholdLevel);
@@ -48,6 +53,7 @@ export default function HomePage() {
             <Webcam
                 ref={webcamRef}
                 audio={false}
+                videoConstraints={videoConstraints}
                 screenshotFormat="image/jpeg"
             />
             <button className="bg-indigo-900 text-white px-2 py-1.5 rounded-md mt-2 mb-2" onClick={capture}>Tarama</button>
